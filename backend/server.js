@@ -23,9 +23,37 @@ app.post("/students", async (req, res) => {
         const student = await Student.create(req.body);
 
         res.status(201).json(student);
+
     } catch (error) {
-        res.status(400).json({
-            message: error.message
+
+        // Duplicate key error
+        if (error.code === 11000) {
+
+            if (error.keyPattern.email) {
+                return res.status(400).json({
+                    message: "Email already exists. Please use a different email."
+                });
+            }
+
+            if (error.keyPattern.rollNo) {
+                return res.status(400).json({
+                    message: "Roll number already exists. Please use a different roll number."
+                });
+            }
+        }
+
+        // Mongoose validation error
+        if (error.name === "ValidationError") {
+            const messages = Object.values(error.errors)
+                .map((err) => err.message);
+
+            return res.status(400).json({
+                message: messages.join(", ")
+            });
+        }
+
+        res.status(500).json({
+            message: "Server error. Please try again."
         });
     }
 });
@@ -81,9 +109,37 @@ app.put("/students/:id", async (req, res) => {
         }
 
         res.status(200).json(student);
+
     } catch (error) {
-        res.status(400).json({
-            message: error.message
+
+        // Duplicate key error
+        if (error.code === 11000) {
+
+            if (error.keyPattern.email) {
+                return res.status(400).json({
+                    message: "Email already exists. Please use a different email."
+                });
+            }
+
+            if (error.keyPattern.rollNo) {
+                return res.status(400).json({
+                    message: "Roll number already exists. Please use a different roll number."
+                });
+            }
+        }
+
+        // Mongoose validation error
+        if (error.name === "ValidationError") {
+            const messages = Object.values(error.errors)
+                .map((err) => err.message);
+
+            return res.status(400).json({
+                message: messages.join(", ")
+            });
+        }
+
+        res.status(500).json({
+            message: "Server error. Please try again."
         });
     }
 });
