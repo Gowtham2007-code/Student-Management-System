@@ -12,10 +12,12 @@ app.use(express.json());
 
 const PORT = 5000;
 
+// Home route
 app.get("/", (req, res) => {
     res.send("Student Management System API is running");
 });
 
+// CREATE - Add student
 app.post("/students", async (req, res) => {
     try {
         const student = await Student.create(req.body);
@@ -28,6 +30,7 @@ app.post("/students", async (req, res) => {
     }
 });
 
+// READ - Get all students
 app.get("/students", async (req, res) => {
     try {
         const students = await Student.find();
@@ -40,6 +43,7 @@ app.get("/students", async (req, res) => {
     }
 });
 
+// READ - Get one student
 app.get("/students/:id", async (req, res) => {
     try {
         const student = await Student.findById(req.params.id);
@@ -58,12 +62,16 @@ app.get("/students/:id", async (req, res) => {
     }
 });
 
+// UPDATE - Update student
 app.put("/students/:id", async (req, res) => {
     try {
         const student = await Student.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true }
+            {
+                new: true,
+                runValidators: true
+            }
         );
 
         if (!student) {
@@ -74,12 +82,13 @@ app.put("/students/:id", async (req, res) => {
 
         res.status(200).json(student);
     } catch (error) {
-        res.status(500).json({
+        res.status(400).json({
             message: error.message
         });
     }
 });
 
+// DELETE - Delete student
 app.delete("/students/:id", async (req, res) => {
     try {
         const student = await Student.findByIdAndDelete(req.params.id);
@@ -100,6 +109,7 @@ app.delete("/students/:id", async (req, res) => {
     }
 });
 
+// Connect MongoDB
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log("MongoDB connected successfully");
